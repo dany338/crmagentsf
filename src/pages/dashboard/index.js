@@ -4,6 +4,7 @@ import Layout from '../layout';
 import pageStyles from './styles/dashboardStyles';
 import { utilsAtom } from '../../atoms';
 import { useAtom } from 'jotai';
+import Search from '../../components/searchTeams';
 
 const Dashboard = ({ history }) => {
   const view = history?.location?.state?.view || 1
@@ -13,7 +14,7 @@ const Dashboard = ({ history }) => {
 
   const renderView = () => {
     if (tabActive === 1) {
-      return null
+      return <Search className={styles.animation } />
     }
   }
 
