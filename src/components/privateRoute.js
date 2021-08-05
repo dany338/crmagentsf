@@ -11,28 +11,29 @@ const PrivateRoute = ({component: Component, ...rest}) => {
   const [, setLoading] = useAtom(utilsAtom.loading)
 
   React.useEffect(() => {
-    authChanged(async (user) => {
-      try {
-        if (!endLoad) {
-          if (user) {
-            // Get user info
-            const userMe = await getUserInfo()
-            if(userMe.onboarding_status === 'completed') {
-              // setUid('')
+    (async() => {
+      const token = await authChanged();
+      if(token) {
+        try {
+          if (!endLoad) {
+            if (token) {
+              // Get user info
+              // const userMe = (async () => await getUserInfo())()
+              const userMe = {};
+              
+              setUid(token)
+              setUserInfo(ov => ({...ov, ...userMe}))
+              setLoading((ov) => ({...ov, opacity: 0.7}))
             } else {
-              setUid(user.uid)
+              setLoading((ov) => ({...ov, opacity: 1}))
             }
-            setUserInfo(ov => ({...ov, ...userMe}))
-            setLoading((ov) => ({...ov, opacity: 0.7}))
-          } else {
-            setLoading((ov) => ({...ov, opacity: 1}))
           }
+          setEndLoad(true)
+        } catch (e) {
+          setEndLoad(true)
         }
-        setEndLoad(true)
-      } catch (e) {
-        setEndLoad(true)
       }
-    })
+    })()
     //eslint-disable-next-line
   }, [])
 

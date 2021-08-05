@@ -15,4 +15,12 @@ export const asyncLocalStorage = {
 			throw err;
 		}
 	},
+	removeItem: async (key) => {
+		try {
+			await Promise.resolve();
+			return window.localStorage.removeItem(key);
+		} catch (err) {
+			throw err;
+		}
+	},
 };

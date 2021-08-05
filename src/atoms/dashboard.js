@@ -1,8 +1,16 @@
 /* eslint-disable import/no-anonymous-default-export */
 import {atom} from 'jotai';
 
-const myLeads = atom([]);
+const leads = atom([]);
+const query = atom('');
+const leadsSelecteds = atom([]);
+const message = atom({});
+const isvisible = atom(false);
 
 export default {
-  myLeads
+  leads,
+  query,
+  leadsSelecteds,
+  message,
+  isvisible
 }

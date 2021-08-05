@@ -19,7 +19,7 @@ const Layout = ({children, history, Footer}) => {
   const onLogout = async () => {
     try {
       setLoading({opacity: 1, show: true})
-      await logOut()
+      await logOut();
       setResetAll(true)
       history.push('/login')
     } catch (e) {
@@ -47,7 +47,7 @@ const Layout = ({children, history, Footer}) => {
   }
 
   const renderHeader = () => {
-    if (routeName !== '/education') {
+    if (routeName !== '/') {
       return <>
         <Box className={styles.hellName}>
           <span className={styles.hello}>

@@ -4,13 +4,13 @@ import { verifyEmail } from '../../utils/validations'
 import pageStyles from './styles/authStyles'
 import {
   authChanged,
-  emailFirebaseLogin
+  login
 } from '../../services/auth'
-import firebase from '../../services/firebase';
 import { userAtom, utilsAtom } from '../../atoms';
 import Icons from '../../utils/icons'
 import returnErrors from '../../utils/errors'
 import { useAtom } from 'jotai'
+import { asyncLocalStorage } from '../../utils/localStorage';
 
 const LoginPage = (props) => {
   const styles = pageStyles()
@@ -40,15 +40,17 @@ const LoginPage = (props) => {
     props.history.push(route)
   }
 
-  const emailLoginFirebase = async () => {
+  const emailLoginCrmagents = async () => {
     try {
       setLoading((ov) => ({...ov, show: true}))
-      const result = await emailFirebaseLogin(vc.email, vc.password)
-      setUid(result.uid)
-      setUserInfo(ov => ({...ov, ...result.user}))
-      goTo('/dashboard')
+      const result = await login({ email: vc.email, password: vc.password})
+      if(result) {
+        setUid(result.refreshToken)
+        setUserInfo(ov => ({...ov, ...result}))
+        await asyncLocalStorage.setItem("token-crmagents", result.accessToken);
+        goTo('/dashboard')
+      }
     } catch (e) {
-      firebase.auth().signOut().then(() => {}).catch(() => {})
       setLoading((ov) => ({...ov, show: false}))
       returnErrors(`Login error: ${String(e)}`, setAlerts)
     }
@@ -62,7 +64,7 @@ const LoginPage = (props) => {
         variant: 'error'
       }])
     } else if (verifyEmail(email)) {
-      emailLoginFirebase()
+      emailLoginCrmagents()
     } else {
       setAlerts(ov => [...ov, {
         message: 'Enter a valid email',
@@ -104,10 +106,13 @@ const LoginPage = (props) => {
   }, [dataUser]);
 
   React.useEffect(() => {
-    authChanged((user) => {
+    (async() => {
+      const token = await authChanged();
+      if(token) {
+        setDataUser(token)
+      }
       setFirstLoad(false)
-      setDataUser(user)
-    })
+    })()
     return () => {}
     //eslint-disable-next-line
   }, []);
@@ -121,7 +126,7 @@ const LoginPage = (props) => {
         alt='ADDI LEADS'
       />
       <Box className={styles.welcome}>
-        Hi ADDI LEADS!
+        Hi Leads!
       </Box>
       <Box className={styles.lblWel}>
         Login with you account
@@ -157,12 +162,6 @@ const LoginPage = (props) => {
           <Box onClick={changeEye} className={styles.eyeBt}>
             <img alt='eye' src={vc.showPassword ? Icons.eye : Icons.eyeOff} />
           </Box>
-        </Box>
-        <Box
-          className={styles.lblLost}
-          onClick={() => goTo('/forgotpassword')}
-        >
-          Forgot your password?
         </Box>
         <Box
           className={[styles.sendBt, !vc.email || !vc.password ? styles.disabledBtn : ''].join(' ')}

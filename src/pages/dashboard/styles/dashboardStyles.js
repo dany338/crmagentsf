@@ -32,6 +32,6 @@ const styles = makeStyles({
     position: 'relative',
     animation: '$appear2 2s ease-out',
   },
-});
+})
 
 export default styles;
